@@ -36,7 +36,27 @@ jobs:
       - name: Clean project
         run: ./gradlew clean
       
-      # 6. Compilar APK de prueba (sin firma)
+            # 6. Decodificar keystore
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > release-key.jks
+      
+      # 7. Compilar APK firmado
+      - name: Build Signed Release APK
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=release-key.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+      
+      # 8. Subir APK firmado
+      - name: Upload Signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShinobiWallpapers-Signed
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 30# 6. Compilar APK de prueba (sin firma)
       - name: Build Debug APK
         run: ./gradlew assembleDebug
       
