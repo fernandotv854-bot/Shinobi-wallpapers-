@@ -1,0 +1,7 @@
+ShinobiWallpapers/
+├── .github/
+│   └── workflows/
+│       └── build.yml          ← ESTE ARCHIVO
+├── app/
+├── build.gradle.kts
+└── ...
