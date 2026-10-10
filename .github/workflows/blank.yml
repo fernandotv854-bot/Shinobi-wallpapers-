@@ -1,4 +1,24 @@
-name: Build Shinobi Wallpapers APK
+      # 6. Decodificar keystore
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > release-key.jks
+      
+      # 7. Compilar APK firmado
+      - name: Build Signed Release APK
+        run: |
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file=release-key.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+      
+      # 8. Subir APK firmado
+      - name: Upload Signed APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ShinobiWallpapers-Signed
+          path: app/build/outputs/apk/release/app-release.apk
+          retention-days: 30name: Build Shinobi Wallpapers APK
 
 on:
   push:
